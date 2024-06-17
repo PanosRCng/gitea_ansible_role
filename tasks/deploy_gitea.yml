@@ -1,0 +1,33 @@
+---
+
+
+- name: Deploy gitea | tear down existing docker stack services
+  community.docker.docker_compose_v2:
+    project_src: "{{ gitea_docker_stack_directory }}"
+    files: 
+      - gitea.yml
+    env_files: 
+      - env
+    state: absent
+    services:
+      - gitea
+
+
+- name: Deploy gitea | deploy docker compose stack services
+  community.docker.docker_compose_v2:
+    project_src: "{{ gitea_docker_stack_directory }}"
+    files: 
+      - gitea.yml
+    env_files: 
+      - env
+    services:
+      - gitea
+  register: output
+
+
+- name: Deploy gitea | verify that services are running
+  ansible.builtin.assert:
+    that:
+      - "output.containers[0].State == 'running'"
+    fail_msg: "containers could not start"
+    success_msg: "containers started"

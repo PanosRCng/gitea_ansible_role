@@ -1,0 +1,14 @@
+---
+
+- name: Copy docker stack files
+  include_tasks: copy_stack.yml
+
+
+- name: Copy env file
+  include_tasks: copy_env.yml
+
+
+- name: Deploy gitea
+  include_tasks: deploy_gitea.yml
+
+

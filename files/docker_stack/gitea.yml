@@ -1,0 +1,55 @@
+services:
+  
+  gitea:
+
+    image: gitea/gitea:1.21.4
+    container_name: gitea
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+        compress: "true"
+    environment:
+      - USER_UID=${USER_UID}
+      - USER_GID=${USER_GID}
+      - ROOT_URL=http://${ROOT_URL_HOST}:${ROOT_URL_PORT}
+    volumes:
+      - gitea_data:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - gitea_net
+    ports:
+      - ${HTTP_PORT}:3000
+      - ${SSH_PORT}:22
+
+
+
+networks:
+  gitea_net:
+    name: gitea_net
+    driver: bridge
+    attachable: true
+    driver_opts:
+      com.docker.network.bridge.enable_ip_masquerade: "true"
+      com.docker.network.bridge.enable_icc: "true"
+      com.docker.network.driver.mtu: "1500"
+    ipam:
+      driver: default
+      config:
+        - subnet: ${NETWORK_SUBNET}
+          gateway: ${NETWORK_GATEWAY}
+
+
+
+
+volumes:
+  gitea_data:
+    name: gitea_volume_gitea
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ${VOLUME_PATH}
